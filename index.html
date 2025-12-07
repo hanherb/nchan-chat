@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Nchan Web Chat with Login Screen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* =============== LOGIN SCREEN =============== */
+
+      .login-container {
+        width: 100%;
+        max-width: 360px;
+        background: #020617;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        border: 1px solid #1f2937;
+        padding: 24px 20px 20px;
+      }
+
+      .login-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #f9fafb;
+        text-align: center;
+      }
+
+      .login-subtitle {
+        font-size: 12px;
+        color: #9ca3af;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .login-field {
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .login-label {
+        font-size: 12px;
+        color: #9ca3af;
+      }
+
+      .login-input {
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid #1f2937;
+        background: #020617;
+        color: #e5e7eb;
+        outline: none;
+        font-size: 14px;
+      }
+
+      .login-input:focus {
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.4);
+      }
+
+      .login-button {
+        width: 100%;
+        margin-top: 6px;
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        background: linear-gradient(135deg, #22c55e, #0ea5e9);
+        color: #0f172a;
+      }
+
+      .login-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .login-error {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #f97316;
+        min-height: 16px;
+        text-align: center;
+      }
+
+      /* =============== CHAT SCREEN =============== */
+
+      .chat-container {
+        width: 100%;
+        max-width: 480px;
+        height: 80vh;
+        max-height: 700px;
+        background: #020617;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #1f2937;
+      }
+
+      .chat-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #111827;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: radial-gradient(circle at top left, #0ea5e9 0, #020617 50%);
+      }
+
+      .chat-header-left {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .chat-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #f9fafb;
+      }
+
+      .chat-subtitle {
+        font-size: 12px;
+        color: #9ca3af;
+      }
+
+      .chat-header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-pill {
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #111827;
+        color: #e5e7eb;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      .logout-button {
+        border: none;
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        background: #111827;
+        color: #e5e7eb;
+        white-space: nowrap;
+      }
+
+      .logout-button:hover {
+        background: #1f2937;
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 12px 12px 8px;
+        overflow-y: auto;
+        background: radial-gradient(circle at top, #0b1120 0, #020617 40%);
+      }
+
+      .message {
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        max-width: 80%;
+      }
+
+      .message-meta {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-bottom: 2px;
+      }
+
+      .message-bubble {
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.4;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+      }
+
+      .message.self {
+        margin-left: auto;
+        align-items: flex-end;
+      }
+
+      .message.self .message-bubble {
+        background: linear-gradient(135deg, #22c55e, #0ea5e9);
+        color: #0f172a;
+        border-bottom-right-radius: 4px;
+      }
+
+      .message.other .message-bubble {
+        background: #020617;
+        border: 1px solid #1f2937;
+        border-bottom-left-radius: 4px;
+      }
+
+      .chat-input-area {
+        border-top: 1px solid #111827;
+        padding: 8px;
+        background: #020617;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid #1f2937;
+        outline: none;
+        background: #020617;
+        color: #e5e7eb;
+        font-size: 14px;
+      }
+
+      .chat-input::placeholder {
+        color: #6b7280;
+      }
+
+      .chat-input:focus {
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.4);
+      }
+
+      .send-button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        background: linear-gradient(135deg, #22c55e, #0ea5e9);
+        color: #0f172a;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .send-button[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .send-icon {
+        font-size: 14px;
+      }
+
+      /* Show/hide screens */
+      #login-screen {
+        display: none;
+      }
+
+      #chat-screen {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="login-container">
+      <div class="login-title">Nchan Chat</div>
+      <div class="login-subtitle">Please log in to join the chat</div>
+
+      <div class="login-field">
+        <label class="login-label" for="login-username">Username</label>
+        <input
+          id="login-username"
+          class="login-input"
+          type="text"
+          placeholder="Your name"
+        />
+      </div>
+      <div class="login-field">
+        <label class="login-label" for="login-password">Password</label>
+        <input
+          id="login-password"
+          class="login-input"
+          type="password"
+          placeholder="Password"
+        />
+      </div>
+      <button id="login-button" class="login-button">Login</button>
+      <div id="login-error" class="login-error"></div>
+    </div>
+
+    <!-- CHAT SCREEN -->
+    <div id="chat-screen" class="chat-container">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-title">Nchan Chat</div>
+          <div class="chat-subtitle" id="chat-subtitle">Connecting…</div>
+        </div>
+        <div class="chat-header-right">
+          <div class="status-pill">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Connecting</span>
+          </div>
+          <button id="logout-button" class="logout-button">Logout</button>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="messages"></div>
+
+      <div class="chat-input-area">
+        <div class="input-row">
+          <input
+            id="message-input"
+            class="chat-input"
+            type="text"
+            placeholder="Type a message and press Enter…"
+          />
+          <button id="send-button" class="send-button">
+            <span class="send-icon">➤</span>
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ===========================
+      //  CONFIG – EDIT THIS PART
+      // ===========================
+
+      const NCHAN_WS_URL = "http://localhost:80/sub?channel_id=dev_channel_1";
+      const NCHAN_PUBLISH_URL =
+        "http://localhost:80/pub?channel_id=dev_channel_1";
+
+      // Static password
+      const STATIC_PASSWORD = "90807060";
+
+      // Nchan payload format (JSON)
+      const USE_JSON_MESSAGES = true;
+
+      // ===========================
+      //  ELEMENTS & STATE
+      // ===========================
+
+      const loginScreen = document.getElementById("login-screen");
+      const chatScreen = document.getElementById("chat-screen");
+
+      const loginUsernameEl = document.getElementById("login-username");
+      const loginPasswordEl = document.getElementById("login-password");
+      const loginButton = document.getElementById("login-button");
+      const loginErrorEl = document.getElementById("login-error");
+
+      const logoutButton = document.getElementById("logout-button");
+      const messagesEl = document.getElementById("messages");
+      const inputEl = document.getElementById("message-input");
+      const sendBtn = document.getElementById("send-button");
+      const statusTextEl = document.getElementById("status-text");
+      const statusDotEl = document.getElementById("status-dot");
+      const chatSubtitleEl = document.getElementById("chat-subtitle");
+
+      let ws = null;
+      let reconnectTimeout = null;
+      let connected = false;
+
+      let currentUser = null;
+      const AUTH_USER_KEY = "nchan-chat-auth-user";
+
+      // ===========================
+      //  UI SCREEN SWITCH
+      // ===========================
+
+      function showLoginScreen() {
+        loginScreen.style.display = "block";
+        chatScreen.style.display = "none";
+        loginErrorEl.textContent = "";
+        loginPasswordEl.value = "";
+        loginButton.disabled = false;
+        loginUsernameEl.focus();
+      }
+
+      function showChatScreen() {
+        loginScreen.style.display = "none";
+        chatScreen.style.display = "flex";
+        inputEl.focus();
+      }
+
+      // ===========================
+      //  CONNECTION STATUS
+      // ===========================
+
+      function setStatus(state, detail) {
+        if (state === "connecting") {
+          statusTextEl.textContent = "Connecting";
+          statusDotEl.style.background = "#eab308";
+          chatSubtitleEl.textContent = detail || "Connecting to server…";
+        } else if (state === "online") {
+          statusTextEl.textContent = "Online";
+          statusDotEl.style.background = "#22c55e";
+          chatSubtitleEl.textContent = detail || "Connected to Nchan";
+        } else {
+          statusTextEl.textContent = "Offline";
+          statusDotEl.style.background = "#ef4444";
+          chatSubtitleEl.textContent = detail || "Disconnected – retrying…";
+        }
+      }
+
+      function connectWs() {
+        if (
+          ws &&
+          (ws.readyState === WebSocket.OPEN ||
+            ws.readyState === WebSocket.CONNECTING)
+        ) {
+          return;
+        }
+
+        setStatus("connecting");
+        connected = false;
+
+        try {
+          ws = new WebSocket(NCHAN_WS_URL);
+        } catch (err) {
+          console.error("WebSocket init error:", err);
+          setStatus("offline", "Failed to open WebSocket");
+          scheduleReconnect();
+          return;
+        }
+
+        ws.onopen = () => {
+          connected = true;
+          setStatus("online");
+        };
+
+        ws.onmessage = (event) => {
+          handleIncomingMessage(event.data);
+        };
+
+        ws.onclose = (event) => {
+          connected = false;
+          console.warn("WebSocket closed", event);
+          setStatus("offline", "Connection closed – retrying…");
+          scheduleReconnect();
+        };
+
+        ws.onerror = (event) => {
+          console.error("WebSocket error", event);
+          // onclose yang akan trigger reconnect
+        };
+      }
+
+      function scheduleReconnect() {
+        if (reconnectTimeout) return;
+        reconnectTimeout = setTimeout(() => {
+          reconnectTimeout = null;
+          connectWs();
+        }, 2000);
+      }
+
+      // ===========================
+      //  MESSAGE HANDLING
+      // ===========================
+
+      function handleIncomingMessage(raw) {
+        let payload = {
+          user: "Unknown",
+          text: String(raw),
+          ts: Date.now(),
+        };
+
+        if (USE_JSON_MESSAGES) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object") {
+              payload.user = parsed.user || parsed.username || payload.user;
+              payload.text = parsed.text || parsed.message || raw;
+              payload.ts = parsed.timestamp || parsed.ts || payload.ts;
+            }
+          } catch (e) {
+            payload.text = raw;
+          }
+        }
+
+        addMessage(payload);
+      }
+
+      // ⬇️ fungsi baru untuk re-align semua bubble sesuai currentUser
+      function refreshMessageAlignments() {
+        const nodes = messagesEl.querySelectorAll(".message");
+        nodes.forEach((node) => {
+          const msgUser = node.dataset.user;
+          if (!msgUser) return;
+
+          if (currentUser && msgUser === currentUser) {
+            node.classList.add("self");
+            node.classList.remove("other");
+          } else {
+            node.classList.add("other");
+            node.classList.remove("self");
+          }
+        });
+      }
+
+      function addMessage({ user, text, ts }) {
+        const isSelf = currentUser && user === currentUser;
+
+        const msgWrapper = document.createElement("div");
+        msgWrapper.className = "message " + (isSelf ? "self" : "other");
+        msgWrapper.dataset.user = user; // ⬅️ simpan username pengirim
+
+        const meta = document.createElement("div");
+        meta.className = "message-meta";
+
+        const when = ts ? new Date(ts) : new Date();
+        const hh = String(when.getHours()).padStart(2, "0");
+        const mm = String(when.getMinutes()).padStart(2, "0");
+
+        meta.textContent = `${user} • ${hh}:${mm}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "message-bubble";
+        bubble.textContent = text;
+
+        msgWrapper.appendChild(meta);
+        msgWrapper.appendChild(bubble);
+        messagesEl.appendChild(msgWrapper);
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      async function sendMessage() {
+        if (!currentUser) {
+          alert("Silakan login dulu.");
+          return;
+        }
+
+        const text = inputEl.value.trim();
+        if (!text) return;
+
+        const user = currentUser;
+        const ts = Date.now();
+
+        const body = USE_JSON_MESSAGES
+          ? JSON.stringify({ user, text, timestamp: ts })
+          : text;
+
+        // Tidak render lokal dulu, tunggu echo dari WS (hindari double bubble)
+        inputEl.value = "";
+        inputEl.focus();
+
+        sendBtn.disabled = true;
+        try {
+          const res = await fetch(NCHAN_PUBLISH_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": USE_JSON_MESSAGES
+                ? "application/json"
+                : "text/plain",
+            },
+            body,
+          });
+
+          if (!res.ok) {
+            console.error("Publish failed:", res.status, res.statusText);
+          }
+        } catch (err) {
+          console.error("Publish error:", err);
+        } finally {
+          sendBtn.disabled = false;
+        }
+      }
+
+      // ===========================
+      //  AUTH LOGIC
+      // ===========================
+
+      function doLogin() {
+        const username = loginUsernameEl.value.trim();
+        const password = loginPasswordEl.value;
+
+        loginErrorEl.textContent = "";
+
+        if (!username) {
+          loginErrorEl.textContent = "Username tidak boleh kosong.";
+          return;
+        }
+
+        if (password !== STATIC_PASSWORD) {
+          loginErrorEl.textContent = "Password salah.";
+          return;
+        }
+
+        // sukses login
+        currentUser = username;
+        localStorage.setItem(AUTH_USER_KEY, username);
+        showChatScreen();
+        refreshMessageAlignments(); // ⬅️ history yang username-nya sama langsung pindah ke kanan
+      }
+
+      function doLogout() {
+        currentUser = null;
+        localStorage.removeItem(AUTH_USER_KEY);
+        refreshMessageAlignments(); // ⬅️ semua balik ke kiri
+        showLoginScreen();
+      }
+
+      function restoreAuthFromStorage() {
+        const saved = localStorage.getItem(AUTH_USER_KEY);
+        if (saved) {
+          currentUser = saved;
+          showChatScreen();
+          refreshMessageAlignments(); // ⬅️ kalau reload & server kirim history
+        } else {
+          showLoginScreen();
+        }
+      }
+
+      // ===========================
+      //  EVENT WIRING
+      // ===========================
+
+      loginButton.addEventListener("click", () => {
+        doLogin();
+      });
+
+      loginPasswordEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          doLogin();
+        }
+      });
+
+      loginUsernameEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          loginPasswordEl.focus();
+        }
+      });
+
+      logoutButton.addEventListener("click", () => {
+        doLogout();
+      });
+
+      sendBtn.addEventListener("click", () => sendMessage());
+
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // ===========================
+      //  INIT
+      // ===========================
+
+      window.addEventListener("load", () => {
+        restoreAuthFromStorage(); // kalau mau selalu mulai dari login, clear localStorage AUTH_USER_KEY
+        connectWs();
+      });
+    </script>
+  </body>
+</html>
