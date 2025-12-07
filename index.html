@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Nchan Web Chat with Login Screen</title>
+    <title>Chat with Login Screen</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       * {
@@ -438,7 +438,7 @@
   <body>
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="login-container">
-      <div class="login-title">Nchan Chat</div>
+      <div class="login-title">Hello!</div>
       <div class="login-subtitle">Please log in to join the chat</div>
 
       <div class="login-field">
@@ -467,7 +467,7 @@
     <div id="chat-screen" class="chat-container">
       <div class="chat-header">
         <div class="chat-header-left">
-          <div class="chat-title">Nchan Chat</div>
+          <div class="chat-title">Hello Chat</div>
           <div class="chat-subtitle" id="chat-subtitle">Connecting…</div>
         </div>
         <div class="chat-header-right">
@@ -571,7 +571,7 @@
         } else if (state === "online") {
           statusTextEl.textContent = "Online";
           statusDotEl.style.background = "#22c55e";
-          chatSubtitleEl.textContent = detail || "Connected to Nchan";
+          chatSubtitleEl.textContent = detail || "Connected to Chatbox";
         } else {
           statusTextEl.textContent = "Offline";
           statusDotEl.style.background = "#ef4444";
