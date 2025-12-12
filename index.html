@@ -634,27 +634,42 @@
       let currentUser = null;
       const AUTH_USER_KEY = "nchan-chat-auth-user";
 
-      // ===== Surprise popup elements =====
-      const surpriseOverlay = document.getElementById("surprise-overlay");
-      const surpriseImage = document.getElementById("surprise-image");
-      const surpriseClose = document.getElementById("surprise-close");
+      // ===== Surprise popup (aman walau HTML di bawah script) =====
+      let surpriseOverlay;
+      let surpriseImage;
+      let surpriseClose;
       
       function showSurprise() {
+        if (!surpriseOverlay || !surpriseImage) return;
         // kalau punya direct-link ke file gambar, pakai yang itu di sini
         surpriseImage.src = "https://ibb.co.com/krxMHcM";
         surpriseOverlay.classList.add("show");
       }
       
       function hideSurprise() {
+        if (!surpriseOverlay) return;
         surpriseOverlay.classList.remove("show");
       }
       
-      surpriseClose.addEventListener("click", hideSurprise);
-      surpriseOverlay.addEventListener("click", (e) => {
-        if (e.target === surpriseOverlay) hideSurprise();
-      });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") hideSurprise();
+      // Wiring popup setelah DOM siap
+      window.addEventListener("load", () => {
+        surpriseOverlay = document.getElementById("surprise-overlay");
+        surpriseImage = document.getElementById("surprise-image");
+        surpriseClose = document.getElementById("surprise-close");
+      
+        if (surpriseClose) {
+          surpriseClose.addEventListener("click", hideSurprise);
+        }
+      
+        if (surpriseOverlay) {
+          surpriseOverlay.addEventListener("click", (e) => {
+            if (e.target === surpriseOverlay) hideSurprise();
+          });
+        }
+      
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") hideSurprise();
+        });
       });
 
       // ===========================
@@ -812,19 +827,24 @@
       
         const cleanText = (text || "").trim().toLowerCase();
       
-        // 🔥 Trigger spesial: kalau teks persis "bubuhbd", tampilkan gambar
         if (cleanText === "dudumagic") {
+          // trigger khusus → gambar kecil yang bisa diklik
           const img = document.createElement("img");
-          img.src = "https://i.ibb.co.com/tN43mC3/Screenshot-2025-12-12-193358.png"; // ganti ke direct image URL kalau kamu punya
-          img.alt = "Surprise untuk Bubu 💕";
-          img.style.maxWidth = "220px";
+          img.src = "https://ibb.co.com/krxMHcM"; // idealnya direct image URL
+          img.alt = "Surprise dari Bubu 💕";
+          img.style.maxWidth = "180px";
           img.style.borderRadius = "18px";
           img.style.display = "block";
+          img.style.cursor = "pointer";
           img.style.marginTop = "2px";
+      
+          img.addEventListener("click", () => {
+            showSurprise();
+          });
       
           bubble.appendChild(img);
         } else {
-          // chat biasa → tampilkan teks
+          // pesan biasa
           bubble.textContent = text;
         }
       
@@ -834,7 +854,6 @@
       
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }
-
 
       async function sendMessage() {
         if (!currentUser) {
